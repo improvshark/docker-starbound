@@ -4,7 +4,7 @@ CONTAINERPORT=21025
 USERNAME=improvshark
 NAME=starbound
 
-DIRECTORY=$NAME
+DIRECTORY=starbound
 APP=211820
 
 STEAMINFO=true
@@ -56,13 +56,16 @@ function install_game {
     fi
 }
 
+function launch {
+    docker rm $NAME
+    docker run  --name $NAME  -i -t -p $CONTAINERPORT:$HOSTPORT -v=$(pwd)/$DIRECTORY:/opt/$DIRECTORY $USERNAME/$NAME
+}
+
 function build {
     docker build -t improvshark/$NAME .
 }
 
-function launch {
-    docker run  --name $NAME  -i -t -p $CONTAINERPORT:$HOSTPORT -v=$(pwd)/$DIRECTORY:/opt/$DIRECTORY $USERNAME/$NAME
-}
+
 
 
 
@@ -84,6 +87,7 @@ case $1 in
         echo "download!"
         install_steamcmd
         install_game
+        build
     ;;
     'build')
         echo "building!"
@@ -96,6 +100,11 @@ case $1 in
     'update')
     echo "updating!"
         update
+        build
+    ;;
+    'clean')
+        rm -rf ./steamcmd
+        rm -rf ./$DIRECTORY
     ;;
 
 esac
